@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>揚帆前行｜永續辯論 PK 站隊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#25447f; --navy-d:#1a2f5a; --orange:#ff8f4d;
+  --evg:#00a651; --evg-d:#007a3b; --evg-l:#c6e8d5;
+  --mae:#3a92c6; --mae-d:#256b94; --mae-l:#c3e1f3;
+  --ink:#1b2b4a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  background:var(--navy);color:#fff;display:flex;flex-direction:column;min-height:100dvh;overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:0}
+.screen{display:none;width:100%;max-width:900px;margin:0 auto;padding:16px}
+.screen.active{display:block}
+
+/* ---------- Intro ---------- */
+#intro{text-align:center;padding-top:7vh;min-height:100dvh}
+#intro .ships{font-size:44px;letter-spacing:8px;animation:bob 2.4s ease-in-out infinite}
+#intro h1{font-size:clamp(22px,5.4vw,38px);line-height:1.5;margin:18px 0 8px;font-weight:900}
+#intro h1 em{font-style:normal;color:var(--orange)}
+#intro p.sub{opacity:.85;margin-bottom:26px;font-size:15px}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;margin:0 auto}
+.side-btn{
+  border-radius:22px;padding:22px 10px;color:#fff;font-weight:900;font-size:clamp(16px,4.2vw,24px);
+  line-height:1.4;box-shadow:0 8px 0 rgba(0,0,0,.28);transition:transform .12s, box-shadow .12s;
+}
+.side-btn small{display:block;font-weight:500;font-size:.62em;opacity:.92;margin-top:6px}
+.side-btn:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.side-btn.e{background:var(--evg)} .side-btn.m{background:var(--mae)}
+.side-btn .big{font-size:2.2em;display:block;margin-bottom:6px}
+.hint{margin-top:22px;font-size:13px;opacity:.7}
+
+/* ---------- Battle (choose indicator) ---------- */
+.badge{display:inline-block;padding:4px 14px;border-radius:999px;font-weight:900;font-size:14px;margin-bottom:8px}
+.badge.e{background:var(--evg)} .badge.m{background:var(--mae)}
+#battle h2{font-size:clamp(18px,4.6vw,26px);line-height:1.5;margin-bottom:12px;font-weight:900}
+#battle h2 b{color:var(--orange)}
+.inds{display:grid;gap:9px}
+.ind{
+  display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;text-align:left;
+  background:#fff;color:var(--ink);border-radius:16px;padding:10px 14px;
+  box-shadow:0 5px 0 rgba(0,0,0,.25);transition:transform .1s, box-shadow .1s;
+}
+.ind:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.ind .ic{font-size:30px;text-align:center}
+.ind b{font-size:16px;display:block}
+.ind span{font-size:12px;color:#51607e;line-height:1.4;display:block}
+.ind.e{border-left:8px solid var(--evg)} .ind.m{border-left:8px solid var(--mae)}
+.ind.picked{outline:4px solid var(--orange);transform:scale(1.02)}
+
+/* ---------- PK ---------- */
+#pk{padding-bottom:6px}
+.pk-top{display:flex;align-items:center;gap:12px}
+.timer{
+  width:74px;height:74px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;
+  font-size:38px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.28);flex:none;
+}
+.timer.hurry{animation:pulse .5s infinite alternate;background:#ff4d4d}
+.pk-title{font-size:14px;line-height:1.5;opacity:.95}
+.pk-title b{font-size:16px;color:#ffd9bd}
+.tbar{height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin:10px 0}
+.tbar i{display:block;height:100%;width:100%;background:var(--orange);transition:width .1s linear}
+.tug{display:flex;height:34px;border-radius:12px;overflow:hidden;font-weight:900;font-size:14px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.tug div{display:flex;align-items:center;padding:0 10px;white-space:nowrap;transition:width .15s linear;min-width:0;overflow:hidden}
+.tug .te{background:var(--evg)} .tug .tm{background:var(--mae);justify-content:flex-end}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.col h4{font-size:12px;margin-bottom:4px;opacity:.9}
+.row{display:grid;grid-template-columns:46px 1fr;align-items:center;gap:6px;font-size:11px;margin:3px 0}
+.row .bar{height:12px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden}
+.row .bar i{display:block;height:100%;width:0;border-radius:6px}
+.col.e .bar i{background:var(--evg)} .col.m .bar i{background:var(--mae)}
+.row.mine{font-weight:900;color:var(--orange)}
+.row.mine .bar{outline:2px solid var(--orange)}
+#ticker{margin-top:8px;font-size:12px;height:20px;overflow:hidden;opacity:.9;white-space:nowrap;text-overflow:ellipsis}
+#ticker span{display:inline-block;animation:slidein .4s ease-out}
+
+/* ---------- Arena ---------- */
+#arena{
+  position:relative;flex:1;min-height:250px;width:100%;max-width:900px;margin:8px auto 0;overflow:hidden;
+  background:linear-gradient(#9fd3f2 0%,#d8f0fb 62%,#fff6e0 100%);border-radius:22px 22px 0 0;
+}
+body[data-screen="intro"] #arena, body[data-screen="result"] #arena{display:none}
+#arena .sun{position:absolute;right:46%;top:8px;font-size:30px;opacity:.85}
+.ground{position:absolute;bottom:0;height:26%;}
+.ground.l{left:0;width:44%;background:linear-gradient(#5fcf8f,#2fa764);border-top-right-radius:30px}
+.ground.r{right:0;width:44%;background:linear-gradient(#7cc3ea,#3a92c6);border-top-left-radius:30px}
+.sea{position:absolute;left:40%;right:40%;bottom:0;height:20%;background:linear-gradient(#4ab0e6,#1f6fa8);overflow:hidden}
+.sea::before,.sea::after{content:"";position:absolute;left:-50%;width:200%;height:14px;top:-4px;
+  background:radial-gradient(circle at 10px 14px,transparent 9px,rgba(255,255,255,.75) 10px,rgba(255,255,255,.75) 12px,transparent 13px) repeat-x;background-size:24px 14px;animation:wave 3s linear infinite}
+.sea::after{top:6px;opacity:.5;animation-duration:4.5s;animation-direction:reverse}
+.man{position:absolute;width:clamp(30px,6vw,50px);transform:scale(var(--s,1));transform-origin:bottom center}
+.man svg{width:100%;display:block;overflow:visible;animation:hop var(--dur,.6s) ease-in-out infinite var(--d,0s)}
+.man .al{transform-box:view-box;transform-origin:20px 26px;animation:wl .35s ease-in-out infinite alternate var(--d,0s)}
+.man .ar{transform-box:view-box;transform-origin:20px 26px;animation:wr .35s ease-in-out infinite alternate var(--d,0s)}
+.man .mouth{transform-box:fill-box;transform-origin:center;animation:talk .22s ease-in-out infinite alternate}
+.you{position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-size:11px;font-weight:900;background:var(--orange);color:#fff;border-radius:8px;padding:1px 6px;white-space:nowrap;animation:bob 1s ease-in-out infinite}
+.cannon{position:absolute;bottom:20px;width:clamp(44px,9vw,70px)}
+.cannon.l{left:33%} .cannon.r{right:33%;transform:scaleX(-1)}
+.cannon.fire svg{animation:recoil .3s}
+.bubble{
+  position:absolute;transform:translate(-50%,0);background:#fff;color:var(--ink);font-weight:900;font-size:clamp(11px,2.9vw,15px);
+  padding:5px 10px;border-radius:14px;border:3px solid;max-width:46%;text-align:center;line-height:1.35;pointer-events:none;
+  animation:bub 2.6s ease-out forwards;z-index:5;
+}
+.bubble.e{border-color:var(--evg)} .bubble.m{border-color:var(--mae)}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:12px;height:12px;background:#fff;border-right:3px solid;border-bottom:3px solid;transform:translateX(-50%) rotate(45deg);border-color:inherit}
+.proj{position:absolute;font-size:clamp(22px,5vw,34px);z-index:6;pointer-events:none}
+.burst{position:absolute;font-size:34px;z-index:7;pointer-events:none;animation:burst .8s ease-out forwards;transform:translate(-50%,0)}
+.cloud{position:absolute;font-size:44px;z-index:4;pointer-events:none;transform:translate(-50%,0);animation:float 3s ease-in-out infinite;transition:opacity .6s,transform .6s}
+.cloud small{display:block;font-size:10px;text-align:center;color:#555;font-weight:900;margin-top:-6px}
+.cloud.gone{opacity:0;transform:translate(-50%,-30px) scale(1.5)}
+.ctext{position:absolute;left:50%;top:10px;transform:translateX(-50%);font-weight:900;font-size:clamp(14px,3.6vw,20px);color:var(--navy);text-shadow:0 2px 0 #fff;z-index:8;white-space:nowrap;pointer-events:none;animation:ctext 1.6s ease-out forwards}
+
+/* ---------- Result ---------- */
+#result{text-align:center;padding-bottom:40px}
+#result .trophy{font-size:64px;animation:bob 1.6s ease-in-out infinite}
+#result h2{font-size:clamp(24px,6vw,36px);font-weight:900;margin:4px 0}
+.score{display:flex;justify-content:center;gap:14px;font-weight:900;font-size:18px;margin:6px 0 14px}
+.score .e{color:#7dffb4} .score .m{color:#9fdcff}
+.card{background:#fff;color:var(--ink);border-radius:20px;padding:16px;margin:12px 0;text-align:left;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.card h3{font-size:14px;color:#51607e;margin-bottom:6px}
+.card .hl{font-size:clamp(20px,5vw,28px);font-weight:900;line-height:1.35}
+.card .hl.e{color:var(--evg-d)} .card .hl.m{color:var(--mae-d)}
+.card .pct{font-size:clamp(40px,12vw,64px);font-weight:900;color:var(--orange);line-height:1.1}
+.card p{font-size:14px;line-height:1.7;margin-top:6px}
+.mine-card{background:linear-gradient(135deg,#fff7ee,#ffe3cd)}
+.rb{display:grid;grid-template-columns:90px 1fr 48px;gap:8px;align-items:center;font-size:12px;margin:5px 0;font-weight:700}
+.rb .bar{height:14px;background:#e7ecf5;border-radius:7px;overflow:hidden}
+.rb .bar i{display:block;height:100%;border-radius:7px;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.rb.e .bar i{background:var(--evg)} .rb.m .bar i{background:var(--mae)}
+.rb.mvp{color:var(--orange)} .rb.mvp .bar i{background:var(--orange)!important}
+.rb.mine span.n::after{content:" ⭐"}
+.again{margin-top:14px;background:var(--orange);color:#fff;font-weight:900;font-size:18px;padding:14px 34px;border-radius:999px;box-shadow:0 6px 0 rgba(0,0,0,.28)}
+.again:active{transform:translateY(5px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
+.conf{position:fixed;top:-20px;width:10px;height:16px;z-index:50;pointer-events:none;animation:fall linear forwards}
+
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes wl{from{transform:rotate(-12deg)}to{transform:rotate(26deg)}}
+@keyframes wr{from{transform:rotate(12deg)}to{transform:rotate(-26deg)}}
+@keyframes talk{from{transform:scaleY(.4)}to{transform:scaleY(1.4)}}
+@keyframes bub{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}12%{opacity:1;transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,-34px)}100%{opacity:0;transform:translate(-50%,-52px)}}
+@keyframes burst{0%{opacity:1;transform:translate(-50%,0) scale(.3)}60%{opacity:1;transform:translate(-50%,-10px) scale(1.5)}100%{opacity:0;transform:translate(-50%,-24px) scale(1.9)}}
+@keyframes wave{to{transform:translateX(24px)}}
+@keyframes float{50%{margin-top:-10px}}
+@keyframes recoil{30%{transform:translateX(-7px)}}
+@keyframes pulse{to{transform:scale(1.14)}}
+@keyframes slidein{from{opacity:0;transform:translateY(10px)}}
+@keyframes ctext{0%{opacity:0;transform:translateX(-50%) scale(.6)}15%{opacity:1;transform:translateX(-50%) scale(1.1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body data-screen="intro">
+
+<!-- 1. 開場 -->
+<section id="intro" class="screen active">
+  <div class="ships">🚢 ⚓ 🚢</div>
+  <h1>聽完長榮和 MAERSK 兩位永續長的辯論交鋒後，<br>你…<em>會支持誰呢？</em></h1>
+  <p class="sub">選一邊加入，和全場觀眾一起 PK！</p>
+  <div class="choose">
+    <button class="side-btn e" data-side="E"><span class="big">🌿</span>長榮海運<small>EVERGREEN<br>綠色地球的守護者</small></button>
+    <button class="side-btn m" data-side="M"><span class="big">🌊</span>MAERSK<small>馬士基<br>能源轉型催化劑</small></button>
+  </div>
+  <p class="hint">👇 選完後，下面的小火柴人會幫你的陣營吶喊</p>
+</section>
+
+<!-- 2. 選指標 -->
+<section id="battle" class="screen">
+  <span class="badge" id="b-badge"></span>
+  <h2 id="b-title"></h2>
+  <div class="inds" id="inds"></div>
+</section>
+
+<!-- 3. PK -->
+<section id="pk" class="screen">
+  <div class="pk-top">
+    <div class="timer" id="timer">30</div>
+    <div class="pk-title" id="pk-title"></div>
+  </div>
+  <div class="tbar"><i id="tbar"></i></div>
+  <div class="tug"><div class="te" id="tug-e"></div><div class="tm" id="tug-m"></div></div>
+  <div class="cols">
+    <div class="col e"><h4>🌿 長榮海運</h4><div id="rows-e"></div></div>
+    <div class="col m"><h4>🌊 MAERSK</h4><div id="rows-m"></div></div>
+  </div>
+  <div id="ticker"></div>
+</section>
+
+<!-- 4. 結果 -->
+<section id="result" class="screen"></section>
+
+<!-- 火柴人競技場 -->
+<div id="arena"></div>
+
+<script>
+/* ================== 資料 ================== */
+const COMP = {
+  E:{name:'長榮海運', en:'EVERGREEN', cls:'e', color:'#00a651', dark:'#007a3b', icon:'🌿'},
+  M:{name:'MAERSK',   en:'MAERSK',    cls:'m', color:'#3a92c6', dark:'#256b94', icon:'🌊'}
+};
+const INDS = [
+  {id:'fin',  icon:'💰', name:'財務經營績效', short:'財務',
+   f:{E:'純益率 18.53%，ROA、ROE 皆較高', M:'營收僅 −2.7%，三大業務分散風險'}},
+  {id:'env',  icon:'🌊', name:'環境保護績效', short:'環境',
+   f:{E:'碳排強度降至 31.21 g/TEU-km，全球首創船對船液態 CO₂ 轉移', M:'交付 10 艘甲醇雙燃料新船，業界首創 e-Methanol 加注'}},
+  {id:'soc',  icon:'🤝', name:'社會共融績效', short:'社會',
+   f:{E:'偏鄉關懷、人才培育、二手貨櫃捐贈', M:'加入聯合國 LET，投入加薩、南蘇丹人道救援'}},
+  {id:'sup',  icon:'🔗', name:'供應鏈管理績效', short:'供應鏈',
+   f:{E:'當地與綠色採購、162 艘船全數取得 SoC IHM 證書', M:'透明付款制度、內部 ESG 數位平台'}},
+  {id:'comp', icon:'🏅', name:'合規或獎勵事蹟', short:'合規',
+   f:{E:'NOAA 減速計畫連續金獎、公司治理評鑑前 6~20%', M:'LEED Gold + GBI Gold、員工敬業度全球前 10%'}}
+];
+// 模擬「全場觀眾」最終戰力（每次進場會小幅隨機抖動，但 MAERSK 環境保護績效永遠是 MVP）
+const BASE = { E:[1700,1250,1380,1230,1190], M:[1450,2300,1280,1530,1200] };
+
+const SHOUT = {
+  E:[
+    '長榮必勝啊！ヽ(°〇°)ﾉ','長榮加油！ヾ(＾∇＾)','綠色地球的守護者！(๑•̀ㅂ•́)و✧',
+    '純益率 18.53% 賺翻啦～٩(ˊᗜˋ*)و','25 艘 LNG 雙燃料新船來囉！(ﾉ≧∀≦)ﾉ','藍鯨減速計畫連年金獎！🐋(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧',
+    '全球首創船對船 CO₂ 轉移！Σ(°ロ°)','ESG 條款 100% 納入合約！(｀・ω・´)','董事出席率 100% 欸！(*´∀`)~♥',
+    '長榮 GO GO GO！ε=ε=ε=┌(;*´Д`)ﾉ','ROE 11.82% 穩穩的～(๑>◡<๑)','綠色採購績優單位三連霸！ヽ(✿ﾟ▽ﾟ)ノ'
+  ],
+  M:[
+    'MAERSK 永續航運業第一！(ง •̀_•́)ง','Maersk 稱霸七海～(´▽`ʃ♡ƪ)','2040 淨零衝啊！＼(≧▽≦)／',
+    '能源轉型催化劑！(☆ω☆)','10 艘甲醇船交付啦！٩(๑>◡<๑)۶','e-Methanol 黑科技！(๑˃ᴗ˂)ﻭ',
+    '2025 零貨櫃落海！(ﾉ´ з `)ノ','營收韌性 −2.7% 超穩！(•̀ᴗ•́)و','流動性儲備 USD 26.4bn！Σ(ﾟдﾟ)',
+    '綠色債券 USD 3.0bn！(*´∀`)~','MAERSK 加油加油！ヾ(≧▽≦*)o','全球 14 國電動重卡開跑！٩(ˊᗜˋ*)و'
+  ]
+};
+const PKSHOUT = {
+  E:['發射永續大砲！(ﾉ>ω<)ﾉ ⚡','不要汙染環境！(`Д´)ノ','NOx 退散～(ง°ل͜°)ง','綠能衝擊波！ヽ(`Д´)ﾉ'],
+  M:['永續大砲，發射！(ﾉ>ω<)ﾉ 💥','汙染滾開！(╯°□°）╯','甲醇火力全開！(ง •̀_•́)ง','淨零光束～ヾ(☆▽☆)']
+};
+const SHOT = {
+  E:['🌿','💧','⚡','♻️','🐋','🌱'],
+  M:['🔋','🌊','🌬️','🌱','♻️','💧']
+};
+
+/* ================== 狀態 ================== */
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const DUR = Math.max(5, parseInt(params.get('t')) || 30);   // 網址加 ?t=10 可縮短秒數測試
+let side=null, ind=null, finals=null, timers=[], startT=0, mans={E:[],M:[]};
+
+function show(name){
+  document.body.dataset.screen = name;
+  document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('active', e.id===name));
+  window.scrollTo(0,0);
+}
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const pick = a=>a[Math.floor(Math.random()*a.length)];
+const fmt = n=>Math.round(n).toLocaleString('en-US');
+
+/* ================== 火柴人 ================== */
+function stickSVG(color){
+  return `<svg viewBox="0 0 40 60">
+    <g stroke="#1b2b4a" stroke-width="3" stroke-linecap="round" fill="none">
+      <line x1="20" y1="22" x2="20" y2="39"/>
+      <line x1="20" y1="39" x2="12" y2="55"/><line x1="20" y1="39" x2="28" y2="55"/>
+      <line class="al" x1="20" y1="26" x2="7" y2="12"/>
+      <line class="ar" x1="20" y1="26" x2="33" y2="12"/>
+    </g>
+    <circle cx="20" cy="12" r="10" fill="#fff" stroke="#1b2b4a" stroke-width="3"/>
+    <path d="M10.5 9 Q20 2 29.5 9" stroke="${color}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="16" cy="12" r="1.6" fill="#1b2b4a"/><circle cx="24" cy="12" r="1.6" fill="#1b2b4a"/>
+    <circle cx="13" cy="16" r="2" fill="#ffb3c1" opacity=".8"/><circle cx="27" cy="16" r="2" fill="#ffb3c1" opacity=".8"/>
+    <ellipse class="mouth" cx="20" cy="17" rx="3" ry="2.2" fill="#c0392b"/>
+  </svg>`;
+}
+const CANNON = `<svg viewBox="0 0 60 40"><g transform="rotate(-22 24 22)"><rect x="10" y="14" width="42" height="13" rx="6" fill="#3b3f4a"/><rect x="46" y="12" width="8" height="17" rx="3" fill="#2a2d36"/></g><circle cx="22" cy="30" r="9" fill="#a8703a" stroke="#6b4420" stroke-width="3"/><circle cx="22" cy="30" r="2.5" fill="#6b4420"/></svg>`;
+
+function buildArena(){
+  const a = $('#arena');
+  let h = `<div class="sun">☀️</div><div class="ground l"></div><div class="ground r"></div><div class="sea"></div>`;
+  const front=[3,13,23,33], back=[8,18,28,38];
+  mans={E:[],M:[]};
+  ['E','M'].forEach(k=>{
+    const c = COMP[k];
+    [[front,6,1],[back,22,.86]].forEach(([xs,y,s])=>{
+      xs.forEach(x=>{
+        const px = k==='E' ? x : 100-x-6;
+        const id = `m-${k}-${mans[k].length}`;
+        mans[k].push({id,x:px+3});
+        h += `<div class="man" id="${id}" style="left:${px}%;bottom:${y}px;--s:${s};--d:${(-Math.random()).toFixed(2)}s;--dur:${rnd(.45,.8).toFixed(2)}s">${stickSVG(c.color)}</div>`;
+      });
+    });
+  });
+  h += `<div class="cannon l" id="cn-E">${CANNON}</div><div class="cannon r" id="cn-M">${CANNON}</div>`;
+  a.innerHTML = h;
+}
+function markYou(){
+  document.querySelectorAll('.you').forEach(e=>e.remove());
+  const el = document.getElementById(mans[side][0].id);
+  if(el) el.insertAdjacentHTML('beforeend','<div class="you">⭐ 你</div>');
+}
+function shout(k, list){
+  const a=$('#arena'); if(!a) return;
+  const m = pick(mans[k]);
+  const x = Math.min(76, Math.max(24, m.x));
+  const b = document.createElement('div');
+  b.className = 'bubble '+COMP[k].cls;
+  b.textContent = pick(list);
+  b.style.left = x+'%';
+  b.style.bottom = (92+Math.random()*60)+'px';
+  a.appendChild(b);
+  setTimeout(()=>b.remove(), 2700);
+}
+
+/* ================== PK 動畫 ================== */
+function fireShot(k, toXpct, onHit){
+  const a=$('#arena'); const W=a.clientWidth;
+  const fromX = k==='E' ? 40 : 60;
+  const el = document.createElement('div');
+  el.className='proj'; el.textContent = pick(SHOT[k]);
+  el.style.left=fromX+'%'; el.style.bottom='70px';
+  a.appendChild(el);
+  const cn=$('#cn-'+k); cn.classList.remove('fire'); void cn.offsetWidth; cn.classList.add('fire');
+  const dx=(toXpct-fromX)/100*W, arc=rnd(60,120);
+  const anim = el.animate([
+    {transform:'translate(0,0) rotate(0deg)'},
+    {transform:`translate(${dx/2}px,${-arc}px) rotate(180deg)`},
+    {transform:`translate(${dx}px,${-rnd(0,30)}px) rotate(360deg)`}
+  ],{duration:rnd(900,1300),easing:'ease-in-out'});
+  anim.onfinish=()=>{
+    const burst=document.createElement('div');
+    burst.className='burst'; burst.textContent=pick(['💥','✨','🌱','💦']);
+    burst.style.left=toXpct+'%'; burst.style.bottom=(70+parseFloat(getComputedStyle(el).bottom)*0)+'px';
+    a.appendChild(burst); setTimeout(()=>burst.remove(),900);
+    el.remove(); if(onHit) onHit();
+  };
+}
+function randomShot(){
+  const k = Math.random()<.5?'E':'M';
+  const target = k==='E' ? rnd(55,90) : rnd(10,45);
+  fireShot(k,target);
+}
+function pollution(){
+  const a=$('#arena');
+  const x = rnd(38,62);
+  const c = document.createElement('div');
+  c.className='cloud'; c.innerHTML='☁️🏭<small>汙染</small>';
+  c.style.left=x+'%'; c.style.bottom=(rnd(95,150))+'px';
+  a.appendChild(c);
+  const k = Math.random()<.5?'E':'M';
+  setTimeout(()=>{
+    fireShot(k, x, ()=>{
+      c.classList.add('gone');
+      const t=document.createElement('div'); t.className='ctext';
+      t.textContent = pick(['汙染消滅！🌳','空氣變乾淨了～✨','NOx 歸零！🍃','海洋守護成功！🐳']);
+      a.appendChild(t); setTimeout(()=>t.remove(),1700);
+      setTimeout(()=>c.remove(),700);
+    });
+  }, 900);
+}
+
+/* ================== 流程 ================== */
+document.querySelectorAll('.side-btn').forEach(b=>b.addEventListener('click',()=>{
+  side=b.dataset.side;
+  buildArena(); markYou(); startShouting(false);
+  const c=COMP[side];
+  $('#b-badge').className='badge '+c.cls; $('#b-badge').textContent=`${c.icon} 你加入了 ${c.name}`;
+  $('#b-title').innerHTML=`請將你神聖的 <b>天使投資人資金</b> 👼💰<br>投入到 <b>${c.name}</b> 的哪一項指標吧！`;
+  $('#inds').innerHTML = INDS.map((d,i)=>`
+    <button class="ind ${c.cls}" data-i="${i}"><div class="ic">${d.icon}</div><div><b>${d.name}</b><span>${d.f[side]}</span></div></button>`).join('');
+  document.querySelectorAll('.ind').forEach(btn=>btn.addEventListener('click',()=>{
+    btn.classList.add('picked'); ind=+btn.dataset.i;
+    document.querySelectorAll('.ind').forEach(x=>x.disabled=true);
+    setTimeout(startPK,450);
+  }));
+  show('battle');
+}));
+
+function clearTimers(){ timers.forEach(t=>clearInterval(t)); timers=[]; }
+function startShouting(fast){
+  clearTimers();
+  let flip=0;
+  timers.push(setInterval(()=>{
+    flip++; shout(flip%2?'E':'M', SHOUT[flip%2?'E':'M']);
+    if(Math.random()<.5) shout(Math.random()<.5?'E':'M', SHOUT[Math.random()<.5?'E':'M']);
+  }, fast?650:1000));
+  shout('E',SHOUT.E); setTimeout(()=>shout('M',SHOUT.M),400);
+}
+
+function jitter(arr){ return arr.map(v=>v*(1+rnd(-.04,.04))); }
+
+function startPK(){
+  finals = {E:jitter(BASE.E), M:jitter(BASE.M)};
+  const c=COMP[side], d=INDS[ind];
+  $('#pk-title').innerHTML=`你投入：<b>${c.name}</b><br>${d.icon} ${d.name}`;
+  ['E','M'].forEach(k=>{
+    $('#rows-'+k.toLowerCase()).innerHTML = INDS.map((x,i)=>`
+      <div class="row ${(k===side&&i===ind)?'mine':''}" id="r-${k}-${i}"><span>${x.icon}${x.short}</span><div class="bar"><i></i></div></div>`).join('');
+  });
+  show('pk');
+  startT = performance.now();
+  clearTimers();
+  startShouting(true);
+  timers.push(setInterval(()=>shout(Math.random()<.5?'E':'M', null||PKSHOUT[Math.random()<.5?'E':'M']),900));
+  timers.push(setInterval(randomShot,750));
+  timers.push(setInterval(pollution,3200)); pollution();
+  timers.push(setInterval(ticker,800));
+  timers.push(setInterval(tick,100));
+  const t=document.createElement('div'); t.className='ctext'; t.textContent='🔥 PK 開始！永續大砲裝填完畢 🔥';
+  $('#arena').appendChild(t); setTimeout(()=>t.remove(),1700);
+}
+
+function valsAt(p){
+  const out={E:[],M:[]};
+  const curve={E:Math.pow(p,.72), M:Math.pow(p,1.35)};
+  ['E','M'].forEach((k,ki)=>{
+    out[k]=finals[k].map((f,i)=>{
+      const wob = 1 + .06*Math.sin(p*22+i*1.7+ki*2)*(1-p);
+      return f*curve[k]*wob;
+    });
+  });
+  return out;
+}
+let lastP=0;
+function tick(){
+  const el=(performance.now()-startT)/1000, remain=Math.max(0,DUR-el), p=Math.min(1,el/DUR);
+  lastP=p;
+  $('#timer').textContent=Math.ceil(remain);
+  $('#timer').classList.toggle('hurry', remain<=5);
+  $('#tbar').style.width=(remain/DUR*100)+'%';
+  const v=valsAt(p);
+  const tE=v.E.reduce((a,b)=>a+b,0), tM=v.M.reduce((a,b)=>a+b,0);
+  const sh = tE+tM>0 ? tE/(tE+tM) : .5;
+  $('#tug-e').style.width=(sh*100)+'%'; $('#tug-m').style.width=((1-sh)*100)+'%';
+  $('#tug-e').textContent=`🌿 ${fmt(tE)}`; $('#tug-m').textContent=`${fmt(tM)} 🌊`;
+  ['E','M'].forEach(k=>v[k].forEach((val,i)=>{
+    $(`#r-${k}-${i} .bar i`).style.width=Math.min(100,val/2500*100)+'%';
+  }));
+  if(remain<=0) finish();
+}
+function ticker(){
+  const k = Math.random()<(.45+lastP*.15)?'M':'E';   // 後半段 MAERSK 衝刺感
+  const w = finals[k]; const sum=w.reduce((a,b)=>a+b,0);
+  let r=Math.random()*sum, i=0; while(r>w[i]){r-=w[i];i++;}
+  const n=Math.floor(rnd(20,180));
+  $('#ticker').innerHTML=`<span>👼 匿名天使 #${Math.floor(rnd(100,999))} 投入 ${COMP[k].name} ${INDS[i].icon}${INDS[i].short} <b>+${n}</b></span>`;
+}
+
+/* ================== 結果 ================== */
+function finish(){
+  clearTimers();
+  const tot={E:finals.E.reduce((a,b)=>a+b,0), M:finals.M.reduce((a,b)=>a+b,0)};
+  const win = tot.M>=tot.E?'M':'E', lose = win==='M'?'E':'M';
+  const wc=COMP[win];
+  const mvp = finals[win].indexOf(Math.max(...finals[win]));
+  const mvpPct = finals[win][mvp]/tot[win]*100;
+  const myPct  = finals[side][ind]/tot[side]*100;
+  const myRank = [...finals[side]].sort((a,b)=>b-a).indexOf(finals[side][ind])+1;
+  const mine = side===win;
+
+  let verdict;
+  if(side===win && ind===mvp) verdict='🎉 太神啦！你選中的就是全場 MVP 指標，直接帶領團隊拿下勝利！';
+  else if(side===win) verdict=`🎉 你的陣營獲勝！你的指標在 ${wc.name} 內排第 ${myRank} 名，是團隊勝利的重要拼圖。`;
+  else verdict=`你支持的 ${COMP[side].name} 這回合以些微差距落敗，但你的指標在隊內排第 ${myRank} 名，貢獻依然被看見 💪`;
+
+  const bars = k=>INDS.map((x,i)=>{
+    const pct=finals[k][i]/tot[k]*100;
+    const isMvp = (k===win && i===mvp);
+    const isMine = (k===side && i===ind);
+    return `<div class="rb ${COMP[k].cls} ${isMvp?'mvp':''} ${isMine?'mine':''}"><span class="n">${x.icon}${x.short}${isMvp?' 👑':''}</span><div class="bar"><i data-w="${pct*2.2}"></i></div><span>${pct.toFixed(1)}%</span></div>`;
+  }).join('');
+
+  $('#result').innerHTML = `
+    <div class="trophy">🏆</div>
+    <h2>${wc.icon} ${wc.name} 勝出！</h2>
+    <div class="score"><span class="e">🌿 長榮 ${fmt(tot.E)}</span><span>vs</span><span class="m">${fmt(tot.M)} MAERSK 🌊</span></div>
+
+    <div class="card">
+      <h3>👑 全場最大貢獻指標</h3>
+      <div class="hl ${wc.cls}">${wc.name}・${INDS[mvp].icon} ${INDS[mvp].name}</div>
+      <p>占 ${wc.name} 總永續點數 <b>${mvpPct.toFixed(1)}%</b>。${INDS[mvp].f[win]}。</p>
+    </div>
+
+    <div class="card mine-card">
+      <h3>👼 你的天使投資</h3>
+      <div class="hl ${COMP[side].cls}">${COMP[side].name}・${INDS[ind].icon} ${INDS[ind].name}</div>
+      <div>你貢獻了</div>
+      <div class="pct">${myPct.toFixed(1)}%</div>
+      <div>的永續點數！</div>
+      <p>${verdict}</p>
+    </div>
+
+    <div class="card">
+      <h3>📊 兩家公司各指標貢獻占比（⭐＝你的選擇）</h3>
+      <div style="font-weight:900;color:var(--evg-d);margin-top:6px">🌿 長榮海運</div>${bars('E')}
+      <div style="font-weight:900;color:var(--mae-d);margin-top:10px">🌊 MAERSK</div>${bars('M')}
+    </div>
+
+    <button class="again" id="again">🔄 再玩一次</button>
+    <p class="hint" style="margin-top:14px">感謝參與！揚帆前行，永續不停 ⚓</p>`;
+  show('result');
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll('.rb .bar i').forEach(i=>i.style.width=i.dataset.w+'%');
+  },80));
+  confetti(wc.color);
+  $('#again').onclick=()=>{ side=null; ind=null; document.querySelectorAll('.conf').forEach(e=>e.remove()); show('intro'); };
+}
+function confetti(main){
+  const cols=[main,'#ff8f4d','#ffd166','#fff','#00a651','#3a92c6'];
+  for(let i=0;i<80;i++){
+    const e=document.createElement('div'); e.className='conf';
+    e.style.left=Math.random()*100+'vw';
+    e.style.background=pick(cols);
+    e.style.animationDuration=rnd(2.5,5)+'s';
+    e.style.animationDelay=rnd(0,1.5)+'s';
+    e.style.borderRadius=Math.random()<.4?'50%':'2px';
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),7500);
+  }
+}
+</script>
+</body>
+</html>
